@@ -3,6 +3,7 @@
 import { checkUser } from '@/lib/checkUser';
 import { db } from '@/lib/db';
 import { generateAIAnswer, ExpenseRecord } from '@/lib/ai';
+import { Prisma } from "@prisma/client";
 
 export async function generateInsightAnswer(question: string): Promise<string> {
   try {
@@ -29,14 +30,15 @@ export async function generateInsightAnswer(question: string): Promise<string> {
     });
 
     // Convert to format expected by AI
-    const expenseData: ExpenseRecord[] = expenses.map((expense) => ({
-      id: expense.id,
-      amount: expense.amount,
-      category: expense.category || 'Other',
-      description: expense.text,
-      date: expense.createdAt.toISOString(),
-    }));
-
+   const expenseData: ExpenseRecord[] = expenses.map(
+  (expense: Prisma.RecordGetPayload<{}>) => ({
+    id: expense.id,
+    amount: expense.amount,
+    category: expense.category || 'Other',
+    description: expense.text,
+    date: expense.createdAt.toISOString(),
+  })
+);
     // Generate AI answer
     const answer = await generateAIAnswer(question, expenseData);
     return answer;
