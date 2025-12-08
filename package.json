@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^6.36.0",
     "@clerk/themes": "^2.4.42",
     "@prisma/client": "^6.0.1",
+    "@prisma/config": "^7.1.0",
     "chart.js": "^4.5.1",
     "next": "16.0.7",
     "openai": "^6.10.0",
