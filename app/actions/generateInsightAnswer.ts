@@ -3,53 +3,39 @@
 import { checkUser } from '@/lib/checkUser';
 import { db } from '@/lib/db';
 import { generateAIAnswer, ExpenseRecord } from '@/lib/ai';
-import { Prisma } from "@prisma/client";
-
-type RecordType = Prisma.Result<typeof db.record, {}, 'findMany'>[number];
-
+import type { Record } from '@prisma/client';   // ← the fix
 
 export async function generateInsightAnswer(question: string): Promise<string> {
   try {
     const user = await checkUser();
-    if (!user) {
-      throw new Error('User not authenticated');
-    }
+    if (!user) throw new Error('User not authenticated');
 
-    // Get user's recent expenses (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const expenses = await db.record.findMany({
       where: {
         userId: user.clerkUserId,
-        createdAt: {
-          gte: thirtyDaysAgo,
-        },
+        createdAt: { gte: thirtyDaysAgo },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 50, // Limit to recent 50 expenses for analysis
+      orderBy: { createdAt: 'desc' },
+      take: 50,
     });
 
-    
+    const expenseData: ExpenseRecord[] = expenses.map(
+      (expense: Record) => ({
+        id: expense.id,
+        amount: expense.amount,
+        category: expense.category || "Other",
+        description: expense.text,
+        date: expense.createdAt.toISOString(),
+      })
+    );
 
-    // Convert to format expected by AI
- const expenseData: ExpenseRecord[] = expenses.map(
-  (expense: RecordType) => ({
-    id: expense.id,
-    amount: expense.amount,
-    category: expense.category || "Other",
-    description: expense.text,
-    date: expense.createdAt.toISOString(),
-  })
-);
+    return await generateAIAnswer(question, expenseData);
 
-    // Generate AI answer
-    const answer = await generateAIAnswer(question, expenseData);
-    return answer;
   } catch (error) {
     console.error('Error generating insight answer:', error);
-    return "I'm unable to provide a detailed answer at the moment. Please try refreshing the insights or check your connection.";
+    return "I'm unable to provide insights right now. Please try again.";
   }
 }
