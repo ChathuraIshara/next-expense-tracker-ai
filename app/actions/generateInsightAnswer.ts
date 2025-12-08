@@ -29,7 +29,7 @@ export async function generateInsightAnswer(question: string): Promise<string> {
     });
 
     // Convert to format expected by AI
-    const expenseData: ExpenseRecord[] = expenses.map((expense) => ({
+    const expenseData: ExpenseRecord[] = expenses.map((expense:any) => ({
       id: expense.id,
       amount: expense.amount,
       category: expense.category || 'Other',
