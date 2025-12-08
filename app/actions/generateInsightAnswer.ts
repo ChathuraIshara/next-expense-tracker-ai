@@ -5,6 +5,9 @@ import { db } from '@/lib/db';
 import { generateAIAnswer, ExpenseRecord } from '@/lib/ai';
 import { Prisma } from "@prisma/client";
 
+type RecordType = Prisma.Result<typeof db.record, {}, 'findMany'>[number];
+
+
 export async function generateInsightAnswer(question: string): Promise<string> {
   try {
     const user = await checkUser();
@@ -29,16 +32,19 @@ export async function generateInsightAnswer(question: string): Promise<string> {
       take: 50, // Limit to recent 50 expenses for analysis
     });
 
+    
+
     // Convert to format expected by AI
-   const expenseData: ExpenseRecord[] = expenses.map(
-  (expense: Prisma.RecordGetPayload<{}>) => ({
+ const expenseData: ExpenseRecord[] = expenses.map(
+  (expense: RecordType) => ({
     id: expense.id,
     amount: expense.amount,
-    category: expense.category || 'Other',
+    category: expense.category || "Other",
     description: expense.text,
     date: expense.createdAt.toISOString(),
   })
 );
+
     // Generate AI answer
     const answer = await generateAIAnswer(question, expenseData);
     return answer;
