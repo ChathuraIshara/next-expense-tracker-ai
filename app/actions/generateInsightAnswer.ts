@@ -3,7 +3,7 @@
 import { checkUser } from '@/lib/checkUser';
 import { db } from '@/lib/db';
 import { generateAIAnswer, ExpenseRecord } from '@/lib/ai';
-import { Record } from "@prisma/client"; // Or whatever your model name is
+
 
 export async function generateInsightAnswer(question: string): Promise<string> {
   try {
@@ -30,7 +30,7 @@ export async function generateInsightAnswer(question: string): Promise<string> {
     });
 
     // Convert to format expected by AI
-    const expenseData: ExpenseRecord[] = expenses.map((expense:Record) => ({
+    const expenseData: ExpenseRecord[] = expenses.map((expense:typeof expenses[number]) => ({
       id: expense.id,
       amount: expense.amount,
       category: expense.category || 'Other',
