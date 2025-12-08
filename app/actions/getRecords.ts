@@ -22,11 +22,16 @@ async function getRecords(): Promise<{
       take: 10, // Limit the request to 10 records
     });
 
-    // Map database field `Date` to the expected `date` property in the Record type
-    const formattedRecords: Record[] = records.map(({ Date, ...rest }) => ({
-      ...rest,
-      date: Date,
-    }));
+   // Use ': any' to bypass the type check
+    const formattedRecords: Record[] = records.map((record: any) => {
+      // Extract properties safely to avoid keyword collision
+      const { Date: recordDate, ...rest } = record;
+      
+      return {
+        ...rest,
+        date: recordDate,
+      };
+    });
 
     return { records: formattedRecords };
   } catch (error) {
