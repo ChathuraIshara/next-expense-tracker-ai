@@ -18,7 +18,7 @@ async function getUserRecord(): Promise<{
       where: { userId },
     });
 
-    const record = records.reduce((sum, record) => sum + record.amount, 0);
+    const record = records.reduce((sum:number, record:any) => sum + record.amount, 0);
 
     // Count the number of days with valid sleep records
     const daysWithRecords = records.filter(
