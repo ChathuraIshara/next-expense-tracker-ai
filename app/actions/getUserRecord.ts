@@ -18,11 +18,13 @@ async function getUserRecord(): Promise<{
       where: { userId },
     });
 
-    const record = records.reduce((sum:number, record:any) => sum + record.amount, 0);
+    // FIX 1: Explicitly type 'sum' as number and 'record' as any
+    const record = records.reduce((sum: number, record: any) => sum + record.amount, 0);
 
     // Count the number of days with valid sleep records
+    // FIX 2: Explicitly type 'record' as any
     const daysWithRecords = records.filter(
-      (record) => record.amount > 0
+      (record: any) => record.amount > 0
     ).length;
 
     return { record, daysWithRecords };
