@@ -1,6 +1,6 @@
 'use server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
+import  db  from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
 interface RecordData {
